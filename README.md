@@ -6,7 +6,7 @@ Tecnologías utilizadas
 - Nodemon para desarrollo
 
 
-Estructura del proyecto
+sstructura del proyecto
 ── prisma/
 │ ├── schema.prisma # Definición del modelo de base de datos
 │ ├── migrations/ # Migraciones automáticas
@@ -20,22 +20,48 @@ Estructura del proyecto
 ├── package.json
 └── README.md 
 
-Cómo ejecutar el proyecto
-1. Clonar el repositorio:
+cómo ejecutar el proyecto
+para clonar el repositorio:
    git clone https://github.com/Yarimetca/backend-outfits.git
    cd backend-outfits
    
 intalar dependencia
 npm install 
 
-Ejecutar Prisma Studio (para ver la base de datos):
+ejecutar Prisma Studio (para ver la base de datos):
 npx prisma studio 
 
-Iniciar el servidor:
+paea iniciar el servidor:
 npm run dev 
 
 Se ejecutará en : http://localhost:4001
 
-Luego haz clic en el botón verde que dice Confirmar cambios (o Commit changes)  y
+luego haz clic en el botón verde que dice Confirmar cambios (o Commit changes)  y
 `README.md` se mostrará automáticamente al inicio del repositorio
+
+
+
+
+el código está en la carpeta src, la base de datos en prisma, y el archivo server.js arranca el servidor
+
+abrir una consola y poner:
+git clone https://github.com/Yarimetca/backend-outfits.git
+cd backend-outfits
+npm install
+npm start
+
+así se podrá correr el proyecto 
+
+
+si Prisma marca error
+probar:
+npx prisma generate
+npx prisma studio
+
+
+y si no abre, revisar si el Prisma está instalado globalmente:
+npm install prisma --save-dev
+
+si de plano no…
+entra a la carpeta prisma/schema.prisma y revisa si todo está igual al mío, ahorita pongo la foto
 
