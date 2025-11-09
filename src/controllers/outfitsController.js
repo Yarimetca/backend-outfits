@@ -18,7 +18,7 @@ export const crearOutfit = async (req, res) => {
 
     if (!nombre || !usuarioId || !estiloId) {
       return res.status(400).json({
-        error: "Faltan campos obligatorios: nombre, usuarioId o estiloId",
+        error: "Faltan campos obligatorios: nombre, usuario o estilo",
       });
     }
 

@@ -33,7 +33,7 @@ export const crearEstilo = async (req, res) => {
   try {
     const { nombre, descripcion, usuarioId } = req.body || {};
     if (!nombre || !usuarioId) {
-      return res.status(400).json({ error: "Faltan campos requeridos (nombre, usuarioId)" });
+      return res.status(400).json({ error: "Faltan campos requeridos (nombre, usuario)" });
     }
 
     const nuevoEstilo = await prisma.estilo.create({
