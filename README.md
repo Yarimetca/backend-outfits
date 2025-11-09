@@ -21,17 +21,23 @@ sstructura del proyecto
 └── README.md 
 
 cómo ejecutar el proyecto
+
 para clonar el repositorio:
+
    git clone https://github.com/Yarimetca/backend-outfits.git
    cd backend-outfits
    
-intalar dependencia
+intalar dependencia:
+
 npm install 
 
+
 ejecutar Prisma Studio (para ver la base de datos):
+
 npx prisma studio 
 
 paea iniciar el servidor:
+
 npm run dev 
 
 Se ejecutará en : http://localhost:4001
@@ -40,11 +46,10 @@ luego haz clic en el botón verde que dice Confirmar cambios (o Commit changes) 
 `README.md` se mostrará automáticamente al inicio del repositorio
 
 
-
-
 el código está en la carpeta src, la base de datos en prisma, y el archivo server.js arranca el servidor
 
 abrir una consola y poner:
+
 git clone https://github.com/Yarimetca/backend-outfits.git
 cd backend-outfits
 npm install
@@ -54,12 +59,15 @@ así se podrá correr el proyecto
 
 
 si Prisma marca error
+
 probar:
+
 npx prisma generate
 npx prisma studio
 
 
 y si no abre, revisar si el Prisma está instalado globalmente:
+
 npm install prisma --save-dev
 
 si de plano no…
