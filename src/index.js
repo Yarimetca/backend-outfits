@@ -15,13 +15,13 @@ app.use("/estilos", estilosRoutes);
 app.use("/prendas", prendasRoutes);
 app.use("/outfits", outfitsRoutes);
 
-
 app.get("/", (req, res) => {
   res.send("Servidor funcionando correctamente");
 });
 
+const PORT = process.env.PORT || 4001;
 
-const PORT = 4001; 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
