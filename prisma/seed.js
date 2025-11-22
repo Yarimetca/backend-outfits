@@ -49,7 +49,7 @@ async function main() {
 
 main()
   .catch((err) => {
-    console.error("❌ Error en el seed:", err);
+    console.error("Error en el seed:", err);
   })
   .finally(async () => {
     await prisma.$disconnect();
