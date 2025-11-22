@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
-import usuariosRoutes from "./routes/usuariosRoutes.js"; 
+
+import usuariosRoutes from "./routes/usuariosRoutes.js";
 import prendasRoutes from "./routes/prendasRoutes.js";
 import estilosRoutes from "./routes/estilosRoutes.js";
 import outfitsRoutes from "./routes/outfitsRoutes.js";
@@ -11,8 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/usuarios", usuariosRoutes);
-app.use("/estilos", estilosRoutes);
 app.use("/prendas", prendasRoutes);
+app.use("/estilos", estilosRoutes);
 app.use("/outfits", outfitsRoutes);
 
 app.get("/", (req, res) => {
@@ -24,4 +25,3 @@ const PORT = process.env.PORT || 4001;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
-
