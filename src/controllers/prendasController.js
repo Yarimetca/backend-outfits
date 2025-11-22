@@ -26,6 +26,7 @@ export const obtenerPrenda = async (req, res) => {
 
     res.json(prenda);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Error al obtener prenda" });
   }
 };
@@ -34,21 +35,18 @@ export const crearPrenda = async (req, res) => {
   try {
     const { nombre, color, imagen, estiloId } = req.body;
 
-    const data = {
-      nombre,
-      color,
-      imagen,
-    };
-
-    if (estiloId) {
-      data.estiloId = Number(estiloId);
-    }
-
-    const nueva = await prisma.prenda.create({ data });
+    const nueva = await prisma.prenda.create({
+      data: {
+        nombre,
+        color,
+        imagen,
+        estiloId: estiloId ? Number(estiloId) : null
+      }
+    });
 
     res.json(nueva);
   } catch (error) {
-    console.error("Error al crear prenda:", error);
+    console.error(error);
     res.status(500).json({ error: "Error al crear prenda" });
   }
 };
@@ -57,26 +55,19 @@ export const actualizarPrenda = async (req, res) => {
   try {
     const { nombre, color, imagen, estiloId } = req.body;
 
-    const data = {
-      nombre,
-      color,
-      imagen,
-    };
-
-    if (estiloId) {
-      data.estiloId = Number(estiloId);
-    } else {
-      data.estiloId = null; // si NO mandas estiloId, lo quitamos
-    }
-
     const prendaActualizada = await prisma.prenda.update({
       where: { id: Number(req.params.id) },
-      data
+      data: {
+        nombre,
+        color,
+        imagen,
+        estiloId: estiloId ? Number(estiloId) : null
+      }
     });
 
     res.json(prendaActualizada);
   } catch (error) {
-    console.error("Error al actualizar prenda:", error);
+    console.error(error);
     res.status(500).json({ error: "Error al actualizar prenda" });
   }
 };
@@ -89,7 +80,7 @@ export const eliminarPrenda = async (req, res) => {
 
     res.json({ message: "Prenda eliminada" });
   } catch (error) {
-    console.error("Error al eliminar prenda:", error);
+    console.error(error);
     res.status(500).json({ error: "Error al eliminar prenda" });
   }
 };
