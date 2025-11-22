@@ -12,6 +12,7 @@ model Usuario {
   nombre    String
   email     String   @unique
   outfits   Outfit[]
+  prendas   Prenda[]
 }
 
 model Estilo {
@@ -30,16 +31,18 @@ model Outfit {
 
   usuario     Usuario  @relation(fields: [usuarioId], references: [id])
   estilo      Estilo   @relation(fields: [estiloId], references: [id])
+
   prendas     Prenda[]
 }
 
 model Prenda {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   nombre    String
-  tipo      String?
   color     String?
-  imagenUrl String?
 
-  outfitId  Int
-  outfit    Outfit  @relation(fields: [outfitId], references: [id])
+  usuarioId Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+
+  outfitId  Int?
+  outfit    Outfit? @relation(fields: [outfitId], references: [id])
 }
