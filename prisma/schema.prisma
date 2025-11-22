@@ -19,30 +19,34 @@ model Estilo {
   id        Int      @id @default(autoincrement())
   nombre    String
   outfits   Outfit[]
+  prendas   Prenda[]
 }
 
 model Outfit {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   nombre      String
   descripcion String?
   imagenUrl   String?
   usuarioId   Int
   estiloId    Int
 
-  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
-  estilo      Estilo   @relation(fields: [estiloId], references: [id])
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+  estilo      Estilo    @relation(fields: [estiloId], references: [id])
 
-  prendas     Prenda[]
+  prendas     Prenda[]  @relation("OutfitPrenda")
 }
 
 model Prenda {
   id        Int      @id @default(autoincrement())
   nombre    String
   color     String?
+  imagen    String?
 
-  usuarioId Int
-  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  usuarioId Int?
+  estiloId  Int?
 
-  outfitId  Int?
-  outfit    Outfit? @relation(fields: [outfitId], references: [id])
+  usuario   Usuario? @relation(fields: [usuarioId], references: [id])
+  estilo    Estilo?  @relation(fields: [estiloId], references: [id])
+
+  outfits   Outfit[] @relation("OutfitPrenda")
 }
