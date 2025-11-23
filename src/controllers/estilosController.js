@@ -15,9 +15,10 @@ export const crearEstilo = async (req, res) => {
   try {
     const { nombre, descripcion } = req.body;
 
-    if (!nombre) {
-      return res.status(400).json({ error: "Falta el nombre del estilo" });
-    }
+  if (!nombre) {
+  return res.status(400).json({ error: "Falta el nombre del estilo" });
+}
+
 
     const nuevoEstilo = await prisma.estilo.create({
       data: { nombre, descripcion },
