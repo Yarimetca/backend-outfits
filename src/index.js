@@ -1,30 +1,28 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
 dotenv.config();
 
-import userRoutes from "./routes/userRoutes.js";
-import categoryRoutes from "./routes/categoryRoutes.js";
-import clothesRoutes from "./routes/clothesRoutes.js";
-import outfitRoutes from "./routes/outfitRoutes.js";
-
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-app.use("/users", userRoutes);
-app.use("/categories", categoryRoutes);
-app.use("/clothes", clothesRoutes);
-app.use("/outfits", outfitRoutes);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+app.use("/public", express.static(path.join(__dirname, "public")));
 
-app.get("/", (req, res) => {
-  res.send("API funcionando correctamente");
-});
+import clothesRoutes from "./routes/clothesRoutes.js";
+import outfitRoutes from "./routes/outfitRoutes.js";
 
-const PORT = process.env.PORT || 4001;
+app.use("/api/clothes", clothesRoutes);
+app.use("/api/outfits", outfitRoutes);
 
-app.listen(PORT, "0.0.0.0", () => {
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
