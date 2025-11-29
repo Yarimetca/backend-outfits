@@ -2,55 +2,50 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Insertando datos de ejemplo...");
+  console.log("Seeding data...");
 
   await prisma.outfit.deleteMany();
-  await prisma.prenda.deleteMany();
-  await prisma.estilo.deleteMany();
-  await prisma.usuario.deleteMany();
+  await prisma.item.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.user.deleteMany();
 
-  const usuario = await prisma.usuario.create({
+  const user = await prisma.user.create({
     data: {
-      nombre: "Adriana",
+      name: "Adriana",
       email: "adriana_seed@gmail.com",
       password: "1234",
-      genero: "femenino",
+      gender: "female",
     },
   });
 
-  const estilo = await prisma.estilo.create({
+  const category = await prisma.category.create({
     data: {
-      nombre: "Casual",
-      descripcion: "Ropa cómoda y relajada",
-      usuarioId: usuario.id,
+      name: "Casual",
     },
   });
 
-  const prenda = await prisma.prenda.create({
+  const item = await prisma.item.create({
     data: {
-      nombre: "Camisa blanca",
-      tipo: "camisa",
-      color: "blanco",
-      usuarioId: usuario.id,
+      name: "White Shirt",
+      color: "white",
+      imageUrl: "https://image.com/shirt.jpg",
+      userId: user.id,
+      categoryId: category.id,
     },
   });
 
   await prisma.outfit.create({
     data: {
-      nombre: "Look diario",
-      descripcion: "Camisa blanca + jeans azules",
-      usuarioId: usuario.id,
-      estiloId: estilo.id,
+      name: "Daily Look",
+      description: "White shirt with blue jeans",
+      userId: user.id,
+      categoryId: category.id,
     },
   });
 
-  console.log("Datos insertados correctamente.");
+  console.log("Seeding completed.");
 }
 
 main()
-  .catch((err) => {
-    console.error("Error en el seed:", err);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch(err => console.error(err))
+  .finally(() => prisma.$disconnect());

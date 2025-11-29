@@ -7,51 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id       Int      @id @default(autoincrement())
+  name     String
+  email    String   @unique
+  password String?
+  gender   String?
 
-model Usuario {
-  id        Int      @id @default(autoincrement())
-  nombre    String
-  email     String   @unique
-  password  String?
-  genero    String?
-
-  outfits   Outfit[]
-  prendas   Prenda[]
+  outfits  Outfit[]
+  items    Item[]
 }
 
-
-model Estilo {
-  id        Int      @id @default(autoincrement())
-  nombre    String
-  outfits   Outfit[]
-  prendas   Prenda[]
+model Category {
+  id       Int      @id @default(autoincrement())
+  name     String
+  outfits  Outfit[]
+  items    Item[]
 }
 
 model Outfit {
-  id          Int       @id @default(autoincrement())
-  nombre      String
-  descripcion String?
-  imagenUrl   String?
-  usuarioId   Int
-  estiloId    Int
+  id        Int       @id @default(autoincrement())
+  name      String
+  description String?
+  imageUrl  String?
 
-  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
-  estilo      Estilo    @relation(fields: [estiloId], references: [id])
+  userId    Int
+  categoryId Int
 
-  prendas     Prenda[]  @relation("OutfitPrenda")
+  user      User      @relation(fields: [userId], references: [id])
+  category  Category  @relation(fields: [categoryId], references: [id])
+
+  items     Item[]    @relation("OutfitItem")
 }
 
-model Prenda {
+model Item {
   id        Int      @id @default(autoincrement())
-  nombre    String
+  name      String
   color     String?
-  imagen    String?
+  imageUrl  String?
 
-  usuarioId Int?
-  estiloId  Int?
+  userId    Int?
+  categoryId Int?
 
-  usuario   Usuario? @relation(fields: [usuarioId], references: [id])
-  estilo    Estilo?  @relation(fields: [estiloId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id])
+  category  Category? @relation(fields: [categoryId], references: [id])
 
-  outfits   Outfit[] @relation("OutfitPrenda")
+  outfits   Outfit[] @relation("OutfitItem")
 }
