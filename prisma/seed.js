@@ -4,8 +4,9 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding data...");
 
+
   await prisma.outfit.deleteMany();
-  await prisma.item.deleteMany();
+  await prisma.clothes.deleteMany();
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
 
@@ -24,7 +25,8 @@ async function main() {
     },
   });
 
-  const item = await prisma.item.create({
+
+  const clothes = await prisma.clothes.create({
     data: {
       name: "White Shirt",
       color: "white",
@@ -40,6 +42,9 @@ async function main() {
       description: "White shirt with blue jeans",
       userId: user.id,
       categoryId: category.id,
+      clothes: {
+        connect: [{ id: clothes.id }], // Outfit contains clothes
+      },
     },
   });
 
@@ -47,5 +52,7 @@ async function main() {
 }
 
 main()
-  .catch(err => console.error(err))
+  .catch(err => {
+    console.error("Seeding error:", err);
+  })
   .finally(() => prisma.$disconnect());
