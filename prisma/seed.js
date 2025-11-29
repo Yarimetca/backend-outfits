@@ -2,15 +2,14 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Seeding data...");
-
+  console.log("Iniciando carga de datos...");
 
   await prisma.outfit.deleteMany();
   await prisma.clothes.deleteMany();
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
 
-  const user = await prisma.user.create({
+  const usuario = await prisma.user.create({
     data: {
       name: "Adriana",
       email: "adriana_seed@gmail.com",
@@ -19,40 +18,39 @@ async function main() {
     },
   });
 
-  const category = await prisma.category.create({
+  const categoria = await prisma.category.create({
     data: {
       name: "Casual",
     },
   });
 
-
-  const clothes = await prisma.clothes.create({
+  const prenda = await prisma.clothes.create({
     data: {
-      name: "White Shirt",
-      color: "white",
+      name: "Camisa Blanca",
+      color: "blanco",
       imageUrl: "https://image.com/shirt.jpg",
-      userId: user.id,
-      categoryId: category.id,
+      userId: usuario.id,
+      categoryId: categoria.id,
     },
   });
 
   await prisma.outfit.create({
     data: {
-      name: "Daily Look",
-      description: "White shirt with blue jeans",
-      userId: user.id,
-      categoryId: category.id,
+      name: "Conjunto Diario",
+      description: "Camisa blanca con jeans azules",
+      userId: usuario.id,
+      categoryId: categoria.id,
       clothes: {
-        connect: [{ id: clothes.id }], // Outfit contains clothes
+        connect: [{ id: prenda.id }],
       },
     },
   });
 
-  console.log("Seeding completed.");
+  console.log("Carga de datos completada.");
 }
 
 main()
-  .catch(err => {
-    console.error("Seeding error:", err);
+  .catch((error) => {
+    console.error("Error durante la carga de datos:", error);
   })
   .finally(() => prisma.$disconnect());

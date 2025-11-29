@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 import userRoutes from "./routes/userRoutes.js";
@@ -19,11 +20,11 @@ app.use("/clothes", clothesRoutes);
 app.use("/outfits", outfitRoutes);
 
 app.get("/", (req, res) => {
-  res.send("API working");
+  res.send("API funcionando correctamente.");
 });
 
 const PORT = process.env.PORT || 4001;
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log("Server running on port " + PORT);
+  console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });

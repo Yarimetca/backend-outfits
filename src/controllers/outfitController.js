@@ -3,25 +3,51 @@ const prisma = new PrismaClient();
 
 export const createOutfit = async (req, res) => {
   try {
-    const { name, description, imageUrl, userId, categoryId } = req.body;
-
-    if (!name || !userId || !categoryId) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
     const outfit = await prisma.outfit.create({
-      data: { name, description, imageUrl, userId, categoryId },
+      data: req.body,
     });
-
-    res.status(201).json(outfit);
-  } catch (error) {
-    console.error("Error creating outfit:", error);
-    res.status(500).json({ error: "Error creating outfit" });
+    res.json(outfit);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
 export const getOutfits = async (req, res) => {
-  const outfits = await prisma.outfit.findMany();
-  res.json(outfits);
+  try {
+    const outfits = await prisma.outfit.findMany({
+      include: {
+        clothes: true,
+        user: true,
+        category: true,
+      },
+    });
+    res.json(outfits);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
+export const updateOutfit = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const outfit = await prisma.outfit.update({
+      where: { id: Number(id) },
+      data: req.body,
+    });
+    res.json(outfit);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const deleteOutfit = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.outfit.delete({
+      where: { id: Number(id) },
+    });
+    res.json({ message: "Outfit deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

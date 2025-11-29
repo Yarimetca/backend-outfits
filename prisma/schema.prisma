@@ -8,49 +8,48 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  name     String
-  email    String   @unique
-  password String?
-  gender   String?
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String?
+  gender    String?
 
-  outfits  Outfit[]
-  items    Item[]
+  outfits   Outfit[]
+  clothes   Clothes[]
 }
 
 model Category {
-  id       Int      @id @default(autoincrement())
-  name     String
-  outfits  Outfit[]
-  items    Item[]
+  id        Int       @id @default(autoincrement())
+  name      String
+
+  outfits   Outfit[]
+  clothes   Clothes[]
 }
 
 model Outfit {
-  id        Int       @id @default(autoincrement())
-  name      String
+  id          Int        @id @default(autoincrement())
+  name        String
   description String?
-  imageUrl  String?
+  imageUrl    String?
+  userId      Int
+  categoryId  Int
 
-  userId    Int
-  categoryId Int
+  user        User       @relation(fields: [userId], references: [id])
+  category    Category   @relation(fields: [categoryId], references: [id])
 
-  user      User      @relation(fields: [userId], references: [id])
-  category  Category  @relation(fields: [categoryId], references: [id])
-
-  items     Item[]    @relation("OutfitItem")
+  clothes     Clothes[]  @relation("OutfitClothes")
 }
 
-model Item {
-  id        Int      @id @default(autoincrement())
-  name      String
-  color     String?
-  imageUrl  String?
-
-  userId    Int?
+model Clothes {
+  id         Int      @id @default(autoincrement())
+  name       String
+  color      String?
+  imageUrl   String?
+  userId     Int?
   categoryId Int?
 
-  user      User?     @relation(fields: [userId], references: [id])
-  category  Category? @relation(fields: [categoryId], references: [id])
+  user       User?       @relation(fields: [userId], references: [id])
+  category   Category?   @relation(fields: [categoryId], references: [id])
 
-  outfits   Outfit[] @relation("OutfitItem")
+  outfits    Outfit[]    @relation("OutfitClothes")
 }

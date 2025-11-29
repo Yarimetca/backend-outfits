@@ -1,12 +1,16 @@
-import express from "express";
+import { Router } from "express";
 import {
   createOutfit,
-  getOutfits
+  getOutfits,
+  updateOutfit,
+  deleteOutfit,
 } from "../controllers/outfitController.js";
 
-const router = express.Router();
+const router = Router();
 
 router.post("/", createOutfit);
 router.get("/", getOutfits);
+router.put("/:id", updateOutfit);
+router.delete("/:id", deleteOutfit);
 
 export default router;

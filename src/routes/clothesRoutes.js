@@ -1,18 +1,16 @@
-import express from "express";
+import { Router } from "express";
 import {
-  crearPrenda,
-  listarPrendas,
-  obtenerPrenda,
-  actualizarPrenda,
-  eliminarPrenda,
-} from "../controllers/prendasController.js";
+  createClothes,
+  getClothes,
+  updateClothes,
+  deleteClothes,
+} from "../controllers/clothesController.js";
 
-const router = express.Router();
+const router = Router();
 
-router.get("/", listarPrendas);
-router.get("/:id", obtenerPrenda);
-router.post("/", crearPrenda);
-router.put("/:id", actualizarPrenda);
-router.delete("/:id", eliminarPrenda);
+router.post("/", createClothes);
+router.get("/", getClothes);
+router.put("/:id", updateClothes);
+router.delete("/:id", deleteClothes);
 
 export default router;

@@ -1,33 +1,51 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export const createUser = async (req, res) => {
+
+export const obtenerUsuarios = async (req, res) => {
   try {
-    const { name, email, password, gender } = req.body;
-
-    if (!name || !email) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    const user = await prisma.user.create({
-      data: { name, email, password, gender },
+    const usuarios = await prisma.user.findMany({
+      include: {
+        outfits: true,
+        clothes: true,
+      }
     });
-
-    res.status(201).json(user);
+    res.json(usuarios);
   } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ error: "Error creating user" });
+    res.status(500).json({ error: "Error al obtener los usuarios." });
   }
 };
 
-export const getUsers = async (req, res) => {
-  const users = await prisma.user.findMany();
-  res.json(users);
+export const crearUsuario = async (req, res) => {
+  try {
+    const usuario = await prisma.user.create({
+      data: req.body,
+    });
+    res.json({ message: "Usuario creado correctamente.", usuario });
+  } catch (error) {
+    res.status(500).json({ error: "Error al crear el usuario." });
+  }
 };
 
-export const getUserById = async (req, res) => {
-  const user = await prisma.user.findUnique({
-    where: { id: parseInt(req.params.id) },
-  });
-  res.json(user);
+export const actualizarUsuario = async (req, res) => {
+  try {
+    const usuario = await prisma.user.update({
+      where: { id: Number(req.params.id) },
+      data: req.body,
+    });
+    res.json({ message: "Usuario actualizado correctamente.", usuario });
+  } catch (error) {
+    res.status(500).json({ error: "Error al actualizar el usuario." });
+  }
+};
+
+export const eliminarUsuario = async (req, res) => {
+  try {
+    await prisma.user.delete({
+      where: { id: Number(req.params.id) },
+    });
+    res.json({ message: "Usuario eliminado correctamente." });
+  } catch (error) {
+    res.status(500).json({ error: "Error al eliminar el usuario." });
+  }
 };
