@@ -15,7 +15,7 @@ app.use(express.json());
 
 app.use("/users", userRoutes);
 app.use("/categories", categoryRoutes);
-app.use("/items", clothesRoutes);
+app.use("/clothes", clothesRoutes);
 app.use("/outfits", outfitRoutes);
 
 app.get("/", (req, res) => {
