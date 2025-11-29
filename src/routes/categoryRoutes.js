@@ -1,9 +1,13 @@
+// render fix
 import express from "express";
-import { getStyles, createStyle } from "../controllers/styleController.js";
+import {
+  createCategory,
+  getCategories
+} from "../controllers/categoryController.js";
 
 const router = express.Router();
 
-router.get("/", getStyles);
-router.post("/", createStyle);
+router.post("/", createCategory);
+router.get("/", getCategories);
 
 export default router;
