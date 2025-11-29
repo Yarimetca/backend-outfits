@@ -6,9 +6,9 @@ export const createCategory = async (req, res) => {
     const category = await prisma.category.create({
       data: req.body,
     });
-    res.json(category);
+    res.json({ message: "Categoría creada correctamente", category });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Error al crear categoría" });
   }
 };
 
@@ -22,7 +22,7 @@ export const getCategories = async (req, res) => {
     });
     res.json(categories);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Error al obtener categorías" });
   }
 };
 
@@ -33,9 +33,9 @@ export const updateCategory = async (req, res) => {
       where: { id: Number(id) },
       data: req.body,
     });
-    res.json(category);
+    res.json({ message: "Categoría actualizada", category });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Error al actualizar categoría" });
   }
 };
 
@@ -45,8 +45,8 @@ export const deleteCategory = async (req, res) => {
     await prisma.category.delete({
       where: { id: Number(id) },
     });
-    res.json({ message: "Category deleted" });
+    res.json({ message: "Categoría eliminada" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Error al eliminar categoría" });
   }
 };

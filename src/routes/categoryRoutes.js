@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import {
   createCategory,
   getCategories,
@@ -6,7 +6,7 @@ import {
   deleteCategory,
 } from "../controllers/categoryController.js";
 
-const router = express.Router();
+const router = Router();
 
 router.post("/", createCategory);
 router.get("/", getCategories);

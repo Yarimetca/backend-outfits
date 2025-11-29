@@ -1,51 +1,52 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-
-export const obtenerUsuarios = async (req, res) => {
+export const createUser = async (req, res) => {
   try {
-    const usuarios = await prisma.user.findMany({
+    const user = await prisma.user.create({
+      data: req.body,
+    });
+    res.json({ message: "Usuario creado correctamente", user });
+  } catch (err) {
+    res.status(500).json({ error: "Error al crear usuario: " + err.message });
+  }
+};
+
+export const getUsers = async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
       include: {
         outfits: true,
         clothes: true,
-      }
+      },
     });
-    res.json(usuarios);
-  } catch (error) {
-    res.status(500).json({ error: "Error al obtener los usuarios." });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: "Error al obtener usuarios" });
   }
 };
 
-export const crearUsuario = async (req, res) => {
+export const updateUser = async (req, res) => {
   try {
-    const usuario = await prisma.user.create({
+    const { id } = req.params;
+    const user = await prisma.user.update({
+      where: { id: Number(id) },
       data: req.body,
     });
-    res.json({ message: "Usuario creado correctamente.", usuario });
-  } catch (error) {
-    res.status(500).json({ error: "Error al crear el usuario." });
+    res.json({ message: "Usuario actualizado", user });
+  } catch (err) {
+    res.status(500).json({ error: "Error al actualizar usuario" });
   }
 };
 
-export const actualizarUsuario = async (req, res) => {
+export const deleteUser = async (req, res) => {
   try {
-    const usuario = await prisma.user.update({
-      where: { id: Number(req.params.id) },
-      data: req.body,
-    });
-    res.json({ message: "Usuario actualizado correctamente.", usuario });
-  } catch (error) {
-    res.status(500).json({ error: "Error al actualizar el usuario." });
-  }
-};
-
-export const eliminarUsuario = async (req, res) => {
-  try {
+    const { id } = req.params;
     await prisma.user.delete({
-      where: { id: Number(req.params.id) },
+      where: { id: Number(id) },
     });
-    res.json({ message: "Usuario eliminado correctamente." });
-  } catch (error) {
-    res.status(500).json({ error: "Error al eliminar el usuario." });
+    res.json({ message: "Usuario eliminado" });
+  } catch (err) {
+    res.status(500).json({ error: "Error al eliminar usuario" });
   }
 };

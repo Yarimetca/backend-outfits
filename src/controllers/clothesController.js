@@ -6,18 +6,24 @@ export const createClothes = async (req, res) => {
     const clothes = await prisma.clothes.create({
       data: req.body,
     });
-    res.json(clothes);
+    res.json({ message: "Prenda creada correctamente", clothes });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Error al crear prenda" });
   }
 };
 
 export const getClothes = async (req, res) => {
   try {
-    const clothes = await prisma.clothes.findMany();
+    const clothes = await prisma.clothes.findMany({
+      include: {
+        category: true,
+        user: true,
+        outfits: true,
+      },
+    });
     res.json(clothes);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Error al obtener prendas" });
   }
 };
 
@@ -28,11 +34,12 @@ export const updateClothes = async (req, res) => {
       where: { id: Number(id) },
       data: req.body,
     });
-    res.json(clothes);
+    res.json({ message: "Prenda actualizada", clothes });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Error al actualizar prenda" });
   }
 };
+
 
 export const deleteClothes = async (req, res) => {
   try {
@@ -40,8 +47,8 @@ export const deleteClothes = async (req, res) => {
     await prisma.clothes.delete({
       where: { id: Number(id) },
     });
-    res.json({ message: "Clothes deleted" });
+    res.json({ message: "Prenda eliminada" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Error al eliminar prenda" });
   }
 };

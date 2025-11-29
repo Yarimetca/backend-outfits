@@ -14,14 +14,14 @@ async function main() {
       name: "Adriana",
       email: "adriana_seed@gmail.com",
       password: "1234",
-      gender: "female",
-    },
+      gender: "female"
+    }
   });
 
   const categoria = await prisma.category.create({
     data: {
-      name: "Casual",
-    },
+      name: "Casual"
+    }
   });
 
   const prenda = await prisma.clothes.create({
@@ -30,8 +30,8 @@ async function main() {
       color: "blanco",
       imageUrl: "https://image.com/shirt.jpg",
       userId: usuario.id,
-      categoryId: categoria.id,
-    },
+      categoryId: categoria.id
+    }
   });
 
   await prisma.outfit.create({
@@ -41,9 +41,9 @@ async function main() {
       userId: usuario.id,
       categoryId: categoria.id,
       clothes: {
-        connect: [{ id: prenda.id }],
-      },
-    },
+        connect: [{ id: prenda.id }]
+      }
+    }
   });
 
   console.log("Carga de datos completada.");
