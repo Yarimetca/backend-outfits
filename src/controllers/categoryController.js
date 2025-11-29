@@ -8,6 +8,7 @@ export const createCategory = async (req, res) => {
     });
     res.json({ message: "Categoría creada correctamente", category });
   } catch (err) {
+    console.error("Error real al crear categoría:", err); 
     res.status(500).json({ error: "Error al crear categoría" });
   }
 };
