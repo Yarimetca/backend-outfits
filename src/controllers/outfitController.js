@@ -1,68 +1,31 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import prisma from "../prisma/client.js";
 
 export const createOutfit = async (req, res) => {
   try {
+    const { name, userId, clothesIds } = req.body;
     const outfit = await prisma.outfit.create({
       data: {
-        ...req.body,
+        name,
+        userId: Number(userId),
         clothes: {
-          connect: req.body.clothesIds?.map((id) => ({ id })),
-        },
+          connect: (clothesIds || []).map(id => ({ id: Number(id) }))
+        }
       },
+      include: { clothes: true }
     });
-
-    res.json({ message: "Outfit creado correctamente", outfit });
+    res.json(outfit);
   } catch (err) {
-    res.status(500).json({ error: "Error al crear outfit" });
+    console.error(err);
+    res.status(500).json({ message: "Error creando outfit" });
   }
 };
 
 export const getOutfits = async (req, res) => {
   try {
-    const outfits = await prisma.outfit.findMany({
-      include: {
-        user: true,
-        category: true,
-        clothes: true,
-      },
-    });
+    const outfits = await prisma.outfit.findMany({ include: { clothes: true, user: true } });
     res.json(outfits);
   } catch (err) {
-    res.status(500).json({ error: "Error al obtener outfits" });
-  }
-};
-
-export const updateOutfit = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const outfit = await prisma.outfit.update({
-      where: { id: Number(id) },
-      data: {
-        ...req.body,
-        clothes: req.body.clothesIds
-          ? {
-              set: req.body.clothesIds.map((c) => ({ id: c })),
-            }
-          : undefined,
-      },
-    });
-
-    res.json({ message: "Outfit actualizado", outfit });
-  } catch (err) {
-    res.status(500).json({ error: "Error al actualizar outfit" });
-  }
-};
-
-export const deleteOutfit = async (req, res) => {
-  try {
-    const { id } = req.params;
-    await prisma.outfit.delete({
-      where: { id: Number(id) },
-    });
-    res.json({ message: "Outfit eliminado" });
-  } catch (err) {
-    res.status(500).json({ error: "Error al eliminar outfit" });
+    console.error(err);
+    res.status(500).json({ message: "Error obteniendo outfits" });
   }
 };

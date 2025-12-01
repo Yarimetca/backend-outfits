@@ -1,16 +1,8 @@
 import { Router } from "express";
-import {
-  createClothes,
-  getClothes,
-  updateClothes,
-  deleteClothes,
-} from "../controllers/clothesController.js";
+import { createClothes, getClothes } from "../controllers/clothesController.js";
+import auth from "../middleware/auth.js";
 
 const router = Router();
-
-router.post("/", createClothes);
-router.get("/", getClothes);
-router.put("/:id", updateClothes);
-router.delete("/:id", deleteClothes);
-
+router.post("/", auth, createClothes);
+router.get("/", auth, getClothes);
 export default router;
