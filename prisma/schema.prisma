@@ -30,7 +30,7 @@ model Clothes {
   categoryId Int
   user       User      @relation(fields: [userId], references: [id])
   userId     Int
-  outfits    Outfit[]  // implicit many-to-many
+  outfits    Outfit[]  
 }
 
 model Outfit {
@@ -38,6 +38,6 @@ model Outfit {
   name    String
   user    User      @relation(fields: [userId], references: [id])
   userId  Int
-  clothes Clothes[] // implicit many-to-many
+  clothes Clothes[] 
 }
 
