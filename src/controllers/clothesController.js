@@ -1,10 +1,9 @@
 import prisma from "../prisma/client.js";
 
-
 export const createClothes = async (req, res) => {
   try {
     const { name, image, categoryId } = req.body;
-    const userId = req.userId;
+    const userId = req.user.id;
 
     if (!name || !categoryId) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
@@ -29,12 +28,12 @@ export const createClothes = async (req, res) => {
 export const getClothesById = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.userId;
+    const userId = req.user.id;
 
     const clothe = await prisma.clothes.findFirst({
       where: {
         id: Number(id),
-        userId: Number(userId),   
+        userId: Number(userId),
       },
     });
 
@@ -50,8 +49,20 @@ export const getClothesById = async (req, res) => {
 };
 
 export const deleteClothes = async (req, res) => {
-  try {   
+  try {
     const { id } = req.params;
+    const userId = req.user.id;
+
+    const clothe = await prisma.clothes.findFirst({
+      where: {
+        id: Number(id),
+        userId: Number(userId),
+      },
+    });
+
+    if (!clothe) {
+      return res.status(404).json({ error: "Prenda no encontrada o no tienes permiso" });
+    }
 
     await prisma.clothes.delete({
       where: { id: Number(id) },
@@ -59,21 +70,22 @@ export const deleteClothes = async (req, res) => {
 
     res.json({ message: "Prenda eliminada" });
   } catch (error) {
+    console.error("Error en deleteClothes:", error);
     res.status(500).json({ error: "Error al eliminar prenda" });
   }
 };
+
 export const updateClothes = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, image, categoryId } = req.body;
-    const userId = req.userId;
+    const userId = req.user.id;
 
-  
     const existingClothe = await prisma.clothes.findFirst({
       where: {
         id: Number(id),
-        userId: Number(userId)
-      }
+        userId: Number(userId),
+      },
     });
 
     if (!existingClothe) {
@@ -85,8 +97,8 @@ export const updateClothes = async (req, res) => {
       data: {
         name: name ?? existingClothe.name,
         image: image ?? existingClothe.image,
-        categoryId: categoryId ? Number(categoryId) : existingClothe.categoryId
-      }
+        categoryId: categoryId ? Number(categoryId) : existingClothe.categoryId,
+      },
     });
 
     res.json(updatedClothe);
@@ -98,12 +110,12 @@ export const updateClothes = async (req, res) => {
 
 export const getClothes = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.user.id;
 
     const clothes = await prisma.clothes.findMany({
       where: {
-        userId: Number(userId)
-      }
+        userId: Number(userId),
+      },
     });
 
     res.json(clothes);
