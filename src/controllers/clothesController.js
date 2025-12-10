@@ -43,4 +43,27 @@ export const getClothes = async (req, res) => {
     console.error("Error en getClothes:", err);
     res.status(500).json({ message: "Error obteniendo prendas" });
   }
+  export const updateClothes = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, categoryId, userId } = req.body;
+
+    const image = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+    const updated = await prisma.clothes.update({
+      where: { id: Number(id) },
+      data: {
+        name,
+        ...(image && { image }),
+        category: categoryId ? { connect: { id: Number(categoryId) } } : undefined,
+        user: userId ? { connect: { id: Number(userId) } } : undefined
+      }
+    });
+
+    res.json(updated);
+  } catch (err) {
+    console.error("Error en updateClothes:", err);
+    res.status(500).json({ message: "Error actualizando prenda" });
+  }
+};
 };
