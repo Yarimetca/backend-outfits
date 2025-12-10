@@ -25,22 +25,31 @@ export const createClothes = async (req, res) => {
   }
 };
 
-export const getClothes = async (req, res) => {
+export const getClothesById = async (req, res) => {
   try {
+    const { id } = req.params;
     const userId = req.userId;
 
-    const clothes = await prisma.clothes.findMany({
-      where: { userId: Number(userId) },
+    const clothe = await prisma.clothes.findFirst({
+      where: {
+        id: Number(id),
+        userId: Number(userId),   
+      },
     });
 
-    res.json(clothes);
+    if (!clothe) {
+      return res.status(404).json({ error: "Prenda no encontrada" });
+    }
+
+    res.json(clothe);
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener ropa" });
+    console.error("Error en getClothesById:", error);
+    res.status(500).json({ error: "Error al obtener prenda" });
   }
 };
 
 export const deleteClothes = async (req, res) => {
-  try {
+  try {   
     const { id } = req.params;
 
     await prisma.clothes.delete({
