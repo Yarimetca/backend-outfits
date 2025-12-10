@@ -130,3 +130,4 @@ export const deleteClothes = async (req, res) => {
     res.status(500).json({ error: "Error al eliminar prenda" });
   }
 };
+const imagePath = req.file ? `/tmp/uploads/${req.file.filename}` : null;
