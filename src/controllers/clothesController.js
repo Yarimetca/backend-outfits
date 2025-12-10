@@ -1,4 +1,5 @@
-import prisma from "../config/prisma.js";
+import prisma from "../prisma/client.js";
+
 
 export const createClothes = async (req, res) => {
   try {
@@ -61,3 +62,37 @@ export const deleteClothes = async (req, res) => {
     res.status(500).json({ error: "Error al eliminar prenda" });
   }
 };
+export const updateClothes = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, image, categoryId } = req.body;
+    const userId = req.userId;
+
+  
+    const existingClothe = await prisma.clothes.findFirst({
+      where: {
+        id: Number(id),
+        userId: Number(userId)
+      }
+    });
+
+    if (!existingClothe) {
+      return res.status(404).json({ error: "Prenda no encontrada o no tienes permiso" });
+    }
+
+    const updatedClothe = await prisma.clothes.update({
+      where: { id: Number(id) },
+      data: {
+        name: name ?? existingClothe.name,
+        image: image ?? existingClothe.image,
+        categoryId: categoryId ? Number(categoryId) : existingClothe.categoryId
+      }
+    });
+
+    res.json(updatedClothe);
+  } catch (error) {
+    console.error("Error en updateClothes:", error);
+    res.status(500).json({ error: "Error al actualizar prenda" });
+  }
+};
+
