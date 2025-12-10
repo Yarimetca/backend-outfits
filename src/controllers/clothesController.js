@@ -96,3 +96,19 @@ export const updateClothes = async (req, res) => {
   }
 };
 
+export const getClothes = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const clothes = await prisma.clothes.findMany({
+      where: {
+        userId: Number(userId)
+      }
+    });
+
+    res.json(clothes);
+  } catch (error) {
+    console.error("Error en getClothes:", error);
+    res.status(500).json({ error: "Error al obtener prendas" });
+  }
+};
