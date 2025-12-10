@@ -10,8 +10,6 @@ export const createClothes = async (req, res) => {
       data: {
         name,
         image,
-        categoryId: Number(categoryId),
-        userId: Number(userId),
         category: { connect: { id: Number(categoryId) } },
         user: { connect: { id: Number(userId) } }
       }
@@ -19,7 +17,7 @@ export const createClothes = async (req, res) => {
 
     res.json(clothes);
   } catch (err) {
-    console.error("❌ Error en createClothes:", err);
+    console.error("Error en createClothes:", err);
     res.status(500).json({ message: "Error creando prenda" });
   }
 };
@@ -35,7 +33,7 @@ export const getClothes = async (req, res) => {
 
     res.json(clothes);
   } catch (err) {
-    console.error("❌ Error en getClothes:", err);
+    console.error("Error en getClothes:", err);
     res.status(500).json({ message: "Error obteniendo prendas" });
   }
 };
