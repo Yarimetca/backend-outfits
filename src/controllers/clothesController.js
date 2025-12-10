@@ -7,13 +7,20 @@ export const createClothes = async (req, res) => {
     const image = req.file ? `/uploads/${req.file.filename}` : null;
 
     const clothes = await prisma.clothes.create({
-      data: {
-        name,
-        image,
-        category: { connect: { id: Number(categoryId) } },
-        user: { connect: { id: Number(userId) } }
-      }
-    });
+  data: {
+    name,
+    type,
+    color,
+    image,
+    category: {
+      connect: { id: Number(categoryId) }
+    },
+    user: {
+      connect: { id: Number(userId) }
+    }
+  }
+})
+
 
     res.json(clothes);
   } catch (err) {
