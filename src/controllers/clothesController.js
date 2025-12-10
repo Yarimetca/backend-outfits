@@ -1,12 +1,13 @@
-
 import prisma from "../prisma/client.js";
 import fs from "fs";
 import path from "path";
 
 const removeFileIfExists = (imagePath) => {
   if (!imagePath) return;
-  const clean = imagePath.replace(/^\//, ""); 
+
+  const clean = imagePath.replace(/^\//, "");
   const filePath = path.join(process.cwd(), clean);
+
   if (fs.existsSync(filePath)) {
     try {
       fs.unlinkSync(filePath);
@@ -18,8 +19,7 @@ const removeFileIfExists = (imagePath) => {
 
 export const createClothes = async (req, res) => {
   try {
-    const { name, categoryId, userId: bodyUserId, type, color } = req.body;
-    const userId = Number(req.user?.id ?? bodyUserId);
+    const { name, categoryId, userId } = req.body;
 
     if (!name) return res.status(400).json({ message: "El nombre es requerido" });
     if (!categoryId) return res.status(400).json({ message: "categoryId es requerido" });
@@ -30,8 +30,6 @@ export const createClothes = async (req, res) => {
     const clothes = await prisma.clothes.create({
       data: {
         name,
-        ...(type && { type }),
-        ...(color && { color }),
         image,
         category: { connect: { id: Number(categoryId) } },
         user: { connect: { id: Number(userId) } }
@@ -48,10 +46,7 @@ export const createClothes = async (req, res) => {
 export const getClothes = async (req, res) => {
   try {
     const clothes = await prisma.clothes.findMany({
-      include: {
-        category: true,
-        user: true
-      }
+      include: { category: true, user: true }
     });
 
     res.json(clothes);
@@ -64,23 +59,19 @@ export const getClothes = async (req, res) => {
 export const updateClothes = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, categoryId, userId: bodyUserId, type, color } = req.body;
-    const userId = Number(req.user?.id ?? bodyUserId);
+    const { name, categoryId, userId } = req.body;
 
     const image = req.file ? `/uploads/${req.file.filename}` : undefined;
 
+    const existing = await prisma.clothes.findUnique({ where: { id: Number(id) } });
+    if (!existing) return res.status(404).json({ message: "Prenda no encontrada" });
 
-    const exists = await prisma.clothes.findUnique({ where: { id: Number(id) } });
-    if (!exists) return res.status(404).json({ message: "Prenda no encontrada" });
-
-    if (image && exists.image) removeFileIfExists(exists.image);
+    if (image && existing.image) removeFileIfExists(existing.image);
 
     const updated = await prisma.clothes.update({
       where: { id: Number(id) },
       data: {
         ...(name && { name }),
-        ...(type && { type }),
-        ...(color && { color }),
         ...(image && { image }),
         ...(categoryId && { category: { connect: { id: Number(categoryId) } } }),
         ...(userId && { user: { connect: { id: Number(userId) } } })
@@ -102,9 +93,7 @@ export const deleteClothes = async (req, res) => {
       where: { id: Number(id) }
     });
 
-    if (!clothes) {
-      return res.status(404).json({ message: "Prenda no encontrada" });
-    }
+    if (!clothes) return res.status(404).json({ message: "Prenda no encontrada" });
 
     if (clothes.image) removeFileIfExists(clothes.image);
 
