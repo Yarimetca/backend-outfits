@@ -31,6 +31,7 @@ model Clothes {
   category   Category  @relation(fields: [categoryId], references: [id])
   categoryId Int
   user       User      @relation(fields: [userId], references: [id])
+   category Category @relation(fields: [categoryId], references: [id])
   userId     Int
   outfits    Outfit[]  
 }

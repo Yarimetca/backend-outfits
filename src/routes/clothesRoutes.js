@@ -1,11 +1,11 @@
-import { Router } from "express";
-import { createClothes, getClothes } from "../controllers/clothesController.js";
-import auth from "../middleware/auth.js";
-import { upload } from "../middleware/upload.js";
+import express from "express";
+import { createClothes, getClothes, deleteClothes } from "../controllers/clothesController.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
-const router = Router();
+const router = express.Router();
 
-router.post("/", auth, upload.single("image"), createClothes);
-router.get("/", auth, getClothes);
+router.post("/", authMiddleware, createClothes);
+router.get("/", authMiddleware, getClothes);
+router.delete("/:id", authMiddleware, deleteClothes);
 
 export default router;
