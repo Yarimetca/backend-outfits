@@ -4,13 +4,13 @@ import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res) => {
   try {
-    const { nombre, email, password, genero } = req.body;
+    const { nombre, email, password } = req.body;
 
-    if (!email || !password || !nombre) {
+    if (!nombre || !email || !password) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
-    const exists = await prisma.usuario.findUnique({
+    const exists = await prisma.user.findUnique({
       where: { email },
     });
 
@@ -18,21 +18,20 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ error: "El usuario ya existe" });
     }
 
-    const hashed = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await prisma.usuario.create({
+    const user = await prisma.user.create({
       data: {
-        nombre,
+        name: nombre,
         email,
-        password: hashed,
-        genero,
+        password: hashedPassword,
       },
     });
 
     res.status(201).json({
-      id: newUser.id,
-      email: newUser.email,
-      nombre: newUser.nombre,
+      id: user.id,
+      name: user.name,
+      email: user.email,
     });
   } catch (error) {
     console.error("ERROR REGISTER:", error);
@@ -44,7 +43,7 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await prisma.usuario.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email },
     });
 

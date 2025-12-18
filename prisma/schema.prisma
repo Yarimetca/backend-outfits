@@ -23,21 +23,22 @@ model Category {
 }
 
 model Clothes {
-  id         Int       @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   name       String
   image      String?
-  category   Category  @relation(fields: [categoryId], references: [id])
   categoryId Int
-  user       User      @relation(fields: [userId], references: [id])
   userId     Int
-  outfits    Outfit[]  
+
+  category Category @relation(fields: [categoryId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+  outfits  Outfit[]
 }
 
 model Outfit {
-  id      Int       @id @default(autoincrement())
+  id      Int      @id @default(autoincrement())
   name    String
-  user    User      @relation(fields: [userId], references: [id])
   userId  Int
-  clothes Clothes[] 
-}
 
+  user    User     @relation(fields: [userId], references: [id])
+  clothes Clothes[]
+}
