@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res) => {
   try {
-    const { nombre, email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!nombre || !email || !password) {
+    if (!name || !email || !password) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
@@ -20,19 +20,20 @@ export const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
-        name: nombre,
+        name,
         email,
         password: hashedPassword,
       },
     });
 
     res.status(201).json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
     });
+
   } catch (error) {
     console.error("ERROR REGISTER:", error);
     res.status(500).json({ error: "Error al registrar usuario" });
@@ -47,7 +48,7 @@ export const loginUser = async (req, res) => {
       where: { email },
     });
 
-    if (!user || !user.password) {
+    if (!user) {
       return res.status(400).json({ error: "Credenciales incorrectas" });
     }
 
@@ -63,6 +64,7 @@ export const loginUser = async (req, res) => {
     );
 
     res.json({ token });
+
   } catch (error) {
     console.error("ERROR LOGIN:", error);
     res.status(500).json({ error: "Error al iniciar sesión" });
