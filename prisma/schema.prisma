@@ -5,9 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("DATABASE_URL")
 }
-
 
 model User {
   id       Int      @id @default(autoincrement())
@@ -31,7 +29,6 @@ model Clothes {
   category   Category  @relation(fields: [categoryId], references: [id])
   categoryId Int
   user       User      @relation(fields: [userId], references: [id])
-   category Category @relation(fields: [categoryId], references: [id])
   userId     Int
   outfits    Outfit[]  
 }
