@@ -4,20 +4,40 @@ import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { nombre, email, password, genero } = req.body;
 
-    const exists = await prisma.user.findUnique({ where: { email } });
-    if (exists) return res.status(400).json({ error: "El usuario ya existe" });
+    if (!nombre || !email || !password) {
+      return res.status(400).json({ error: "Faltan campos obligatorios" });
+    }
+
+    const exists = await prisma.usuario.findUnique({
+      where: { email },
+    });
+
+    if (exists) {
+      return res.status(400).json({ error: "El usuario ya existe" });
+    }
 
     const hashed = await bcrypt.hash(password, 10);
 
-    const newUser = await prisma.user.create({
-      data: { email, password: hashed },
+    const newUser = await prisma.usuario.create({
+      data: {
+        nombre,
+        email,
+        password: hashed,
+        genero,
+      },
     });
 
-    res.json(newUser);
+    res.status(201).json(newUser);
+
   } catch (error) {
-    res.status(500).json({ error: "Error al registrar usuario" });
+    console.error("ERROR REGISTER:", error);
+
+    res.status(500).json({
+      error: error.message,
+      code: error.code || null,
+    });
   }
 };
 
@@ -25,21 +45,29 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.usuario.findUnique({
       where: { email },
     });
 
-    if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
+    if (!user) {
+      return res.status(400).json({ error: "Usuario no encontrado" });
+    }
 
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(400).json({ error: "Contraseña incorrecta" });
+    if (!valid) {
+      return res.status(400).json({ error: "Contraseña incorrecta" });
+    }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     res.json({ token });
+
   } catch (error) {
-    res.status(500).json({ error: "Error al iniciar sesión" });
+    console.error("ERROR LOGIN:", error);
+    res.status(500).json({ error: error.message });
   }
 };
