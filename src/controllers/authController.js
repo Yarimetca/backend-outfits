@@ -6,10 +6,6 @@ export const registerUser = async (req, res) => {
   try {
     const { nombre, email, password, genero } = req.body;
 
-    if (!nombre || !email || !password) {
-      return res.status(400).json({ error: "Faltan campos obligatorios" });
-    }
-
     const exists = await prisma.usuario.findUnique({
       where: { email },
     });
@@ -18,25 +14,22 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ error: "El usuario ya existe" });
     }
 
-    const hashed = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await prisma.usuario.create({
       data: {
         nombre,
         email,
-        password: hashed,
+        password: hashedPassword,
         genero,
       },
     });
 
     res.status(201).json(newUser);
-
   } catch (error) {
     console.error("ERROR REGISTER:", error);
-
     res.status(500).json({
       error: error.message,
-      code: error.code || null,
     });
   }
 };
@@ -65,9 +58,8 @@ export const loginUser = async (req, res) => {
     );
 
     res.json({ token });
-
   } catch (error) {
     console.error("ERROR LOGIN:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Error al iniciar sesión" });
   }
 };
