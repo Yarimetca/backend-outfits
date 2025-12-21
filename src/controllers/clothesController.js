@@ -1,13 +1,13 @@
-import prisma from "../prisma/client.js";
-import path from "path";
+    import prisma from "../prisma/client.js";
 
-export const createClothes = async (req, res) => {
+ export const createClothes = async (req, res) => {
   try {
-    const { name, categoryId } = req.body;
+    const { name, categoryId, color, style, season } = req.body;
     const userId = req.user?.id;
 
-
-    const image = req.file ? `/uploads/${req.file.filename}` : (req.body.image || null);
+    const image = req.file
+      ? `/uploads/${req.file.filename}`
+      : (req.body.image || null);
 
     if (!name || !categoryId) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
@@ -19,6 +19,9 @@ export const createClothes = async (req, res) => {
         image,
         categoryId: Number(categoryId),
         userId: Number(userId),
+        color,
+        style,
+        season,
       },
     });
 
@@ -29,51 +32,50 @@ export const createClothes = async (req, res) => {
   }
 };
 
-export const getClothes = async (req, res) => {
-  try {
-    const userId = req.user?.id;
+    export const getClothes = async (req, res) => {
+      try {
+        const userId = req.user?.id;
 
-    const clothes = await prisma.clothes.findMany({
-      where: {
-        userId: Number(userId),
-      },
-    });
+        const clothes = await prisma.clothes.findMany({
+          where: {
+            userId: Number(userId),
+          },
+        });
 
-    res.json(clothes);
-  } catch (error) {
-    console.error("Error en getClothes:", error);
-    res.status(500).json({ error: "Error al obtener prendas" });
-  }
-};
+        res.json(clothes);
+      } catch (error) {
+        console.error("Error en getClothes:", error);
+        res.status(500).json({ error: "Error al obtener prendas" });
+      }
+    };
 
-export const getClothesById = async (req, res) => {
+    export const getClothesById = async (req, res) => {
+      try {
+        const { id } = req.params;
+        const userId = req.user?.id;
+
+        const clothe = await prisma.clothes.findFirst({
+          where: {
+            id: Number(id),
+            userId: Number(userId),
+          },
+        });
+
+        if (!clothe) {
+          return res.status(404).json({ error: "Prenda no encontrada" });
+        }
+
+        res.json(clothe);
+      } catch (error) {
+        console.error("Error en getClothesById:", error);
+        res.status(500).json({ error: "Error al obtener prenda" });
+      }
+    };
+
+    export const updateClothes = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user?.id;
-
-    const clothe = await prisma.clothes.findFirst({
-      where: {
-        id: Number(id),
-        userId: Number(userId),
-      },
-    });
-
-    if (!clothe) {
-      return res.status(404).json({ error: "Prenda no encontrada" });
-    }
-
-    res.json(clothe);
-  } catch (error) {
-    console.error("Error en getClothesById:", error);
-    res.status(500).json({ error: "Error al obtener prenda" });
-  }
-};
-
-export const updateClothes = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const { name, categoryId } = req.body;
+    const { name, categoryId, color, style, season } = req.body;
     const userId = req.user?.id;
 
     const existingClothe = await prisma.clothes.findFirst({
@@ -87,13 +89,19 @@ export const updateClothes = async (req, res) => {
       return res.status(404).json({ error: "Prenda no encontrada o no tienes permiso" });
     }
 
-  
     const updatedClothe = await prisma.clothes.update({
       where: { id: Number(id) },
       data: {
         name: name ?? existingClothe.name,
-        image: req.file ? `/uploads/${req.file.filename}` : (req.body.image ?? existingClothe.image),
-        categoryId: categoryId ? Number(categoryId) : existingClothe.categoryId,
+        image: req.file
+          ? `/uploads/${req.file.filename}`
+          : (req.body.image ?? existingClothe.image),
+        categoryId: categoryId
+          ? Number(categoryId)
+          : existingClothe.categoryId,
+        color: color ?? existingClothe.color,
+        style: style ?? existingClothe.style,
+        season: season ?? existingClothe.season,
       },
     });
 
@@ -104,29 +112,31 @@ export const updateClothes = async (req, res) => {
   }
 };
 
-export const deleteClothes = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user?.id;
 
-    const clothe = await prisma.clothes.findFirst({
-      where: {
-        id: Number(id),
-        userId: Number(userId),
-      },
-    });
+    export const deleteClothes = async (req, res) => {
+      try {
+        const { id } = req.params;
+        const userId = req.user?.id;
 
-    if (!clothe) {
-      return res.status(404).json({ error: "Prenda no encontrada o no tienes permiso" });
-    }
+        const clothe = await prisma.clothes.findFirst({
+          where: {
+            id: Number(id),
+            userId: Number(userId),
+          },
+        });
 
-    await prisma.clothes.delete({
-      where: { id: Number(id) },
-    });
+        if (!clothe) {
+          return res.status(404).json({ error: "Prenda no encontrada o no tienes permiso" });
+        }
 
-    res.json({ message: "Prenda eliminada" });
-  } catch (error) {
-    console.error("Error en deleteClothes:", error);
-    res.status(500).json({ error: "Error al eliminar prenda" });
-  }
-};
+        await prisma.clothes.delete({
+          where: { id: Number(id) },
+        });
+
+        res.json({ message: "Prenda eliminada" });
+      } catch (error) {
+        console.error("Error en deleteClothes:", error);
+        res.status(500).json({ error: "Error al eliminar prenda" });
+      }
+    };
+          

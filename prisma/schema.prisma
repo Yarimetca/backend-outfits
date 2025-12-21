@@ -29,13 +29,13 @@ model Clothes {
   categoryId Int
   userId     Int
 
-  color      String    // blanco, negro, azul, rojo
-  style      String    // casual, formal, sport
-  season     String    // verano, invierno, todo
+  color      String?
+  style      String?
+  season     String?
 
-  category   Category  @relation(fields: [categoryId], references: [id])
-  user       User      @relation(fields: [userId], references: [id])
-  outfits    Outfit[]
+  category Category @relation(fields: [categoryId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+  outfits  Outfit[]
 }
 
 
