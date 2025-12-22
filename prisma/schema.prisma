@@ -29,15 +29,14 @@ model Clothes {
   categoryId Int
   userId     Int
 
-  color      String?
-  style      String?
-  season     String?
+  color   String?   // white, black, blue, red
+  style   String?   // casual, formal, sport
+  season  String?   // verano, invierno, otoño
 
   category Category @relation(fields: [categoryId], references: [id])
   user     User     @relation(fields: [userId], references: [id])
   outfits  Outfit[]
 }
-
 
 model Outfit {
   id      Int      @id @default(autoincrement())
