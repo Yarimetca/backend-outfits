@@ -1,0 +1,4 @@
+ALTER TABLE "Clothes"
+ADD COLUMN "color" TEXT,
+ADD COLUMN "style" TEXT,
+ADD COLUMN "season" TEXT;
