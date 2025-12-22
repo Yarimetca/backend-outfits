@@ -1,8 +1,9 @@
-import { Router } from "express";
-import { createOutfit, getOutfits } from "../controllers/outfitController.js";
+import express from "express";
+import { recommendOutfit } from "../controllers/outfitController.js";
 import auth from "../middleware/auth.js";
 
-const router = Router();
-router.post("/", auth, createOutfit);
-router.get("/", auth, getOutfits);
+const router = express.Router();
+
+router.get("/recommend", auth, recommendOutfit);
+
 export default router;
