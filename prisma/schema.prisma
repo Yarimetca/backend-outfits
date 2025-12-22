@@ -32,12 +32,13 @@ model Clothes {
   season     String?
 
   categoryId Int
-  userId     Int
+  userId     Int?
 
   category Category @relation(fields: [categoryId], references: [id])
-  user     User     @relation(fields: [userId], references: [id])
+  user     User?     @relation(fields: [userId], references: [id])
   outfits  Outfit[]
 }
+
 
 
 model Outfit {
