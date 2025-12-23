@@ -8,44 +8,55 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
   name     String
-  email    String   @unique
+  email    String @unique
   password String
-  clothes  Clothes[]
-  outfits  Outfit[]
+
+  clothes Clothes[]
+  outfits Outfit[]
 }
 
 model Category {
-  id      Int      @id @default(autoincrement())
-  name    String
+  id   Int    @id @default(autoincrement())
+  name String
+
   clothes Clothes[]
 }
 
 model Clothes {
-  id         Int      @id @default(autoincrement())
-  name       String
-  image      String?
+  id    Int     @id @default(autoincrement())
+  name  String
+  image String?
 
-  color      String?
-  style      String?
-  season     String?
+  color  String
+  style  String
+  season String
 
   categoryId Int
-  userId     Int?
+  userId     Int
 
   category Category @relation(fields: [categoryId], references: [id])
-  user     User?     @relation(fields: [userId], references: [id])
-  outfits  Outfit[]
+  user     User     @relation(fields: [userId], references: [id])
+
+  outfits OutfitClothes[]
 }
 
-
-
 model Outfit {
-  id      Int      @id @default(autoincrement())
-  name    String
-  userId  Int
+  id     Int    @id @default(autoincrement())
+  name   String
+  userId Int
 
-  user    User     @relation(fields: [userId], references: [id])
-  clothes Clothes[]
+  user    User            @relation(fields: [userId], references: [id])
+  clothes OutfitClothes[]
+}
+
+model OutfitClothes {
+  outfitId  Int
+  clothesId Int
+
+  outfit  Outfit  @relation(fields: [outfitId], references: [id])
+  clothes Clothes @relation(fields: [clothesId], references: [id])
+
+  @@id([outfitId, clothesId])
 }
