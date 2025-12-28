@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import routes from "./routes/index.js";
 import prisma from "./prisma/client.js";
+import path from "path";
 
 dotenv.config();
 
