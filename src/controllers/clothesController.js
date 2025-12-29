@@ -2,7 +2,6 @@ import prisma from "../prisma/client.js";
 
 export const createClothes = async (req, res) => {
   try {
-    // 🔍 Logs para debug (puedes quitarlos luego)
     console.log("BODY:", req.body);
     console.log("FILE:", req.file);
     console.log("USER:", req.user);
@@ -18,12 +17,14 @@ export const createClothes = async (req, res) => {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
+    if (!req.file) {
+      return res.status(400).json({ error: "Imagen requerida" });
+    }
 
     const newClothes = await prisma.clothes.create({
       data: {
         name: String(name),
-        image,
+        image: req.file.path,
         categoryId: Number(categoryId),
         userId: Number(userId),
         color: String(color),
@@ -33,12 +34,12 @@ export const createClothes = async (req, res) => {
     });
 
     return res.status(201).json(newClothes);
-
   } catch (error) {
     console.error("Error en createClothes:", error);
     return res.status(500).json({ error: "Error al crear prenda" });
   }
 };
+
 
 export const getClothes = async (req, res) => {
   try {
