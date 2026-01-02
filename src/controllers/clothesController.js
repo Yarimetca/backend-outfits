@@ -1,45 +1,26 @@
 import prisma from "../prisma/client.js";
 
+// Busca tu función createClothes y asegúrate que la parte de 'image' sea así:
 export const createClothes = async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
-    console.log("USER:", req.user);
-
     const { name, categoryId, color, style, season } = req.body;
     const userId = req.user?.id;
 
-    if (!userId) {
-      return res.status(401).json({ error: "Usuario no autenticado" });
-    }
-
-    if (!name || !categoryId || !color || !style || !season) {
-      return res.status(400).json({ error: "Faltan campos obligatorios" });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({ error: "Imagen requerida" });
-    }
-
-    // DENTRO DE createClothes
-const newClothes = await prisma.clothes.create({
-  data: {
-    name: String(name),
-    // Esto asegura que si Cloudinary o Multer mandan \, se conviertan en /
-    image: req.file.path.replace(/\\/g, "/"), 
-    categoryId: Number(categoryId),
-    userId: Number(userId),
-    color: String(color),
-    style: String(style),
-    season: String(season),
-  },
-});
-
-
+    const newClothes = await prisma.clothes.create({
+      data: {
+        name: String(name),
+        // CORRECCIÓN: Cambia barras de Windows por barras de URL
+        image: req.file.path.replace(/\\/g, "/"), 
+        categoryId: Number(categoryId),
+        userId: Number(userId),
+        color: String(color),
+        style: String(style),
+        season: String(season),
+      },
+    });
     return res.status(201).json(newClothes);
   } catch (error) {
-    console.error("Error en createClothes:", error);
-    return res.status(500).json({ error: "Error al crear prenda" });
+    res.status(500).json({ error: "Error al crear" });
   }
 };
 

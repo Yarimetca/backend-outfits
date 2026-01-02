@@ -1,29 +1,33 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
 import routes from "./routes/index.js";
 import prisma from "./prisma/client.js";
-import path from "path";
 
 dotenv.config();
 
 const app = express();
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+// 1. Configuración de Middlewares
 app.use(cors());
 app.use(express.json());
 
+// 2. LA MAGIA: Servir archivos estáticos
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+// 3. Rutas
 app.use("/api", routes);
 
 const PORT = process.env.PORT || 3000;
 
+// 4. Arrancar servidor una sola vez con conexión a base de datos
 app.listen(PORT, async () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
   try {
     await prisma.$connect();
-    console.log("Prisma conectado");
+    console.log("✅ Prisma conectado a la base de datos");
   } catch (err) {
-    console.error("Prisma error:", err);
+    console.error("❌ Error conectando Prisma:", err);
   }
 });
-
-    
