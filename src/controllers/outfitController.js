@@ -2,99 +2,56 @@ import prisma from "../prisma/client.js";
 
 const NEUTRAL_COLORS = ["white", "black", "gray", "beige", "cream"];
 
-const pickRandom = (arr) =>
-  arr[Math.floor(Math.random() * arr.length)];
+const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 const colorMatches = (a, b) => {
   if (!a || !b) return true;
-  if (NEUTRAL_COLORS.includes(a)) return true;
-  if (NEUTRAL_COLORS.includes(b)) return true;
-  return a !== b;
+  if (NEUTRAL_COLORS.includes(a.toLowerCase())) return true;
+  if (NEUTRAL_COLORS.includes(b.toLowerCase())) return true;
+  return a.toLowerCase() !== b.toLowerCase();
 };
 
-const buildReason = ({ style, season, top, bottom, footwear }) => {
-  let reasons = [];
-
-  if (NEUTRAL_COLORS.includes(top.color)) {
-    reasons.push("Color neutro fácil de combinar");
-  }
-
-  reasons.push(`Estilo ${style}`);
-  reasons.push(`Ideal para ${season}`);
-
-  return reasons.join(" · ");
-};
-
-export const recommendOutfit = async (req, res) => {
+export const getRecommendation = async (req, res) => {
   try {
     const userId = req.user?.id;
     const { style, season } = req.query;
 
     if (!userId || !style || !season) {
-      return res.status(400).json({
-        error: "style y season son obligatorios"
-      });
+      return res.status(400).json({ error: "style y season son obligatorios" });
     }
 
-    // 🔥 TOP 10 POR CATEGORÍA
+    // Buscamos las prendas REALES en la base de datos
     const tops = await prisma.clothes.findMany({
-      where: {
-        userId,
-        categoryId: 1,
-        style,
-        season,
-        image: { not: null }
-      },
-      take: 10
+      where: { userId: Number(userId), categoryId: 1, style, season }
     });
 
     const bottoms = await prisma.clothes.findMany({
-      where: {
-        userId,
-        categoryId: 2,
-        style,
-        season,
-        image: { not: null }
-      },
-      take: 10
+      where: { userId: Number(userId), categoryId: 2, style, season }
     });
 
     const footwear = await prisma.clothes.findMany({
-      where: {
-        userId,
-        categoryId: 3,
-        style,
-        season,
-        image: { not: null }
-      },
-      take: 10
+      where: { userId: Number(userId), categoryId: 3, style, season }
     });
 
-    if (!tops.length || !bottoms.length || !footwear.length) {
-      return res.status(400).json({
-        error: "No hay suficientes prendas para este outfit"
-      });
+    if (tops.length === 0 || bottoms.length === 0 || footwear.length === 0) {
+      return res.status(404).json({ error: "No tienes suficiente ropa de este estilo/temporada para combinar." });
     }
 
+    // Elegimos prendas que SI existen
     const top = pickRandom(tops);
+    const bottom = bottoms.find(b => colorMatches(top.color, b.color)) || pickRandom(bottoms);
+    const shoes = footwear.find(f => colorMatches(bottom.color, f.color)) || pickRandom(footwear);
 
-    const bottom =
-      bottoms.find(b => colorMatches(top.color, b.color)) ||
-      pickRandom(bottoms);
-
-    const shoes =
-      footwear.find(f => colorMatches(bottom.color, f.color)) ||
-      pickRandom(footwear);
-
-    return res.json({
+    // Mandamos el objeto COMPLETO. Android recibirá top.id real.
+    res.json({
       top,
       bottom,
-      footwear: shoes,
-      reason: buildReason({ style, season, top, bottom, footwear: shoes })
+      shoes, // Lo cambié a 'shoes' para que coincida con tu Android
+      description: `Outfit ${style} para ${season}. Combinación basada en colores ${top.color} y ${bottom.color}.`
     });
 
   } catch (err) {
     console.error("OUTFIT ERROR:", err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 };
