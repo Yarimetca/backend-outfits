@@ -24,21 +24,27 @@ export const getRecommendation = async (req, res) => {
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = `
-      Eres un experto en moda. Tengo la siguiente ropa:
-      ${clothesList}
+// En outfitController.js
+const prompt = `
+  Eres un estilista personal inteligente. Tengo esta ropa en mi armario:
+  ${clothesList}
 
-      Crea un outfit para la ocasión "${style}" y clima "${season}".
-      Debes elegir un ID de categoría 1 (top), uno de categoría 2 (bottom) y uno de categoría 3 (shoes).
-      
-      Responde ÚNICAMENTE en formato JSON:
-      {
-        "topId": número_del_id,
-        "bottomId": número_del_id,
-        "shoesId": número_del_id,
-        "description": "explicación de por qué combina"
-      }
-    `;
+  Ocasión: "${style}"
+  Clima: "${season}"
+
+  INSTRUCCIONES DE EMERGENCIA:
+  1. Debes elegir obligatoriamente un ID para cada categoría: Superior (Categoría 1), Inferior (Categoría 2) y Calzado (Categoría 3, 4 o 5).
+  2. Si no hay ropa que coincida exactamente con "${style}", ¡NO TE RINDAS! Elige las prendas que mejor combinen de lo que tengo disponible.
+  3. No respondas con errores. Siempre devuelve un outfit completo.
+
+  Responde solo JSON:
+  {
+    "topId": número_id_real,
+    "bottomId": número_id_real,
+    "shoesId": número_id_real,
+    "description": "explicación de por qué este look funciona"
+  }
+`;
 
     const result = await model.generateContent(prompt);
     const responseIA = JSON.parse(result.response.text());
