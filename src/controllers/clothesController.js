@@ -21,17 +21,20 @@ export const createClothes = async (req, res) => {
       return res.status(400).json({ error: "Imagen requerida" });
     }
 
-    const newClothes = await prisma.clothes.create({
-      data: {
-        name: String(name),
-        image: req.file.path,
-        categoryId: Number(categoryId),
-        userId: Number(userId),
-        color: String(color),
-        style: String(style),
-        season: String(season),
-      },
-    });
+    // DENTRO DE createClothes
+const newClothes = await prisma.clothes.create({
+  data: {
+    name: String(name),
+    // Esto asegura que si Cloudinary o Multer mandan \, se conviertan en /
+    image: req.file.path.replace(/\\/g, "/"), 
+    categoryId: Number(categoryId),
+    userId: Number(userId),
+    color: String(color),
+    style: String(style),
+    season: String(season),
+  },
+});
+
 
     return res.status(201).json(newClothes);
   } catch (error) {
@@ -102,9 +105,7 @@ export const updateClothes = async (req, res) => {
       where: { id: Number(id) },
       data: {
         name: name ?? existingClothe.name,
-        image: req.file
-          ? `/uploads/${req.file.filename}`
-          : existingClothe.image,
+       image: req.file ? req.file.path.replace(/\\/g, "/") : existingClothe.image,
         categoryId: categoryId
           ? Number(categoryId)
           : existingClothe.categoryId,
