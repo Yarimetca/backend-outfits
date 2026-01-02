@@ -1,57 +1,62 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import prisma from "../prisma/client.js";
 
-const NEUTRAL_COLORS = ["white", "black", "gray", "beige", "cream"];
-
-const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
-
-const colorMatches = (a, b) => {
-  if (!a || !b) return true;
-  if (NEUTRAL_COLORS.includes(a.toLowerCase())) return true;
-  if (NEUTRAL_COLORS.includes(b.toLowerCase())) return true;
-  return a.toLowerCase() !== b.toLowerCase();
-};
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const getRecommendation = async (req, res) => {
   try {
     const userId = req.user?.id;
     const { style, season } = req.query;
 
-    if (!userId || !style || !season) {
-      return res.status(400).json({ error: "style y season son obligatorios" });
+    // 1. Buscamos TODA la ropa del usuario para que la IA la conozca
+    const allClothes = await prisma.clothes.findMany({
+      where: { userId: Number(userId) }
+    });
+
+    if (allClothes.length === 0) {
+      return res.status(404).json({ error: "No tienes ropa en tu armario aún." });
     }
 
-    // Buscamos las prendas REALES en la base de datos
-    const tops = await prisma.clothes.findMany({
-      where: { userId: Number(userId), categoryId: 1, style, season }
-    });
+    // 2. Preparamos la lista para Gemini (solo IDs, nombres y categorías)
+    const clothesList = allClothes.map(c => 
+      `ID: ${c.id}, Categoría: ${c.categoryId}, Nombre: ${c.name}, Color: ${c.color}, Estilo: ${c.style}`
+    ).join("\n");
 
-    const bottoms = await prisma.clothes.findMany({
-      where: { userId: Number(userId), categoryId: 2, style, season }
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const footwear = await prisma.clothes.findMany({
-      where: { userId: Number(userId), categoryId: 3, style, season }
-    });
+    const prompt = `
+      Eres un experto en moda. Tengo la siguiente ropa:
+      ${clothesList}
 
-    if (tops.length === 0 || bottoms.length === 0 || footwear.length === 0) {
-      return res.status(404).json({ error: "No tienes suficiente ropa de este estilo/temporada para combinar." });
-    }
+      Crea un outfit para la ocasión "${style}" y clima "${season}".
+      Debes elegir un ID de categoría 1 (top), uno de categoría 2 (bottom) y uno de categoría 3 (shoes).
+      
+      Responde ÚNICAMENTE en formato JSON:
+      {
+        "topId": número_del_id,
+        "bottomId": número_del_id,
+        "shoesId": número_del_id,
+        "description": "explicación de por qué combina"
+      }
+    `;
 
-    // Elegimos prendas que SI existen
-    const top = pickRandom(tops);
-    const bottom = bottoms.find(b => colorMatches(top.color, b.color)) || pickRandom(bottoms);
-    const shoes = footwear.find(f => colorMatches(bottom.color, f.color)) || pickRandom(footwear);
+    const result = await model.generateContent(prompt);
+    const responseIA = JSON.parse(result.response.text());
 
-    // Mandamos el objeto COMPLETO. Android recibirá top.id real.
+    // 3. Buscamos los objetos completos para enviárselos a Android
+    const top = allClothes.find(c => c.id === responseIA.topId);
+    const bottom = allClothes.find(c => c.id === responseIA.bottomId);
+    const shoes = allClothes.find(c => c.id === responseIA.shoesId);
+
     res.json({
       top,
       bottom,
-      shoes, // Lo cambié a 'shoes' para que coincida con tu Android
-      description: `Outfit ${style} para ${season}. Combinación basada en colores ${top.color} y ${bottom.color}.`
+      shoes,
+      description: responseIA.description
     });
 
   } catch (err) {
-    console.error("OUTFIT ERROR:", err);
-    res.status(500).json({ error: "Error interno del servidor" });
+    console.error("GEMINI ERROR:", err);
+    res.status(500).json({ error: "La IA tuvo un problema al elegir tu outfit" });
   }
 };
