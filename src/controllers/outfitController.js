@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import prisma from "../prisma/client.js";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY.trim());
 
 export const getRecommendation = async (req, res) => {
   try {
@@ -36,7 +36,10 @@ export const getRecommendation = async (req, res) => {
     ).join("\n");
 
     // CAMBIO VITAL: Usar gemini-1.5-flash
-const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({
+  model: "gemini-1.0-pro"
+});
+
     const prompt = `
       Eres un experto en moda. Mi armario:
       ${clothesList}
