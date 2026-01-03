@@ -1,4 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -10,41 +9,25 @@ dotenv.config();
 
 const app = express();
 
-// 1. Configuración de Middlewares
+// 1. Middlewares
 app.use(cors());
 app.use(express.json());
 
-// 2. LA MAGIA: Servir archivos estáticos
+// 2. Servir imágenes subidas
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// 3. Rutas
+// 3. Rutas principales
 app.use("/api", routes);
 
 const PORT = process.env.PORT || 3000;
-// ================== DEBUG GEMINI MODELS ==================
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-app.get("/debug/models", async (req, res) => {
-  try {
-    const models = await genAI.listModels();
-    res.json(models);
-  } catch (err) {
-    console.error("ERROR listModels:", err);
-    res.status(500).json({
-      error: err.message,
-      stack: err.stack,
-    });
-  }
-});
-
-
-// 4. Arrancar servidor una sola vez con conexión a base de datos
+// 4. Arrancar servidor
 app.listen(PORT, async () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
   try {
     await prisma.$connect();
-    console.log("Prisma conectado a la base de datos");
+    console.log("✅ Prisma conectado a la base de datos");
   } catch (err) {
-    console.error("Error conectando Prisma:", err);
+    console.error("❌ Error conectando Prisma:", err);
   }
 });
