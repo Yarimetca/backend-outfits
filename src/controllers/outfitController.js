@@ -1,3 +1,5 @@
+import prisma from "../prisma/client.js";
+
 export const getRecommendation = async (req, res) => {
   try {
     const userId = Number(req.user.id);
