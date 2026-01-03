@@ -1,67 +1,51 @@
 import prisma from "../prisma/client.js";
 
-// 1. CREAR PRENDA (Subir ropa)
+// CREAR PRENDA
 export const createClothes = async (req, res) => {
   try {
-    const { name, color, style, season } = req.body;
-    const userId = req.user?.id;
+    const { name, color, style, season, categoryId } = req.body;
+    const userId = Number(req.user?.id);
 
-    // --- CAMBIO CLAVE: Conversión segura de números ---
-    // Convertimos a número y verificamos si es válido para evitar el error NaN
-    const parsedCategoryId = parseInt(req.body.categoryId);
-    const parsedUserId = parseInt(userId);
-
-    // Validación de seguridad para categoryId
-    if (isNaN(parsedCategoryId)) {
-      console.error("Error: categoryId recibido no es un número:", req.body.categoryId);
-      return res.status(400).json({ 
-        error: "El categoryId es inválido o no fue enviado correctamente." 
-      });
-    }
-
-    // Validación: Si no hay archivo, lanzamos error
     if (!req.file) {
-      return res.status(400).json({ error: "Debes subir una imagen de la prenda" });
+      return res.status(400).json({ error: "Debes subir una imagen" });
     }
 
     const newClothes = await prisma.clothes.create({
       data: {
-        name: String(name || "Sin nombre"),
-        // Limpiamos la URL para que siempre use barras frontales /
-        image: req.file.path.replace(/\\/g, "/"), 
-        categoryId: parsedCategoryId, // Usamos el número validado
-        userId: parsedUserId,       // Usamos el número validado
-        color: String(color || "Indefinido"),
-        style: String(style || "Casual"),
-        season: String(season || "Todas"),
+        name: name || "Sin nombre",
+        image: req.file.path.replace(/\\/g, "/"),
+        categoryId: Number(categoryId),
+        userId,
+        color: color || "Indefinido",
+        style: style || "Casual",
+        season: season || "Todas",
       },
     });
 
-    console.log("Prenda creada con éxito. ID:", newClothes.id);
-    return res.status(201).json(newClothes);
-
+    res.status(201).json(newClothes);
   } catch (error) {
-    console.error("Error completo en createClothes:", error);
-    res.status(500).json({ error: "No se pudo guardar la prenda en la base de datos" });
+    console.error(error);
+    res.status(500).json({ error: "Error al crear prenda" });
   }
 };
 
-// 2. OBTENER TODA LA ROPA (Del usuario logueado)
+// OBTENER PRENDAS
 export const getClothes = async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = Number(req.user?.id);
 
     const clothes = await prisma.clothes.findMany({
-      where: { userId: Number(userId) },
-      orderBy: { id: 'desc' } // Trae las más nuevas primero
+      where: { userId },
+      include: { category: true },
+      orderBy: { id: "desc" },
     });
 
     res.json(clothes);
   } catch (error) {
-    console.error("Error en getClothes:", error);
-    res.status(500).json({ error: "Error al obtener tu armario" });
+    res.status(500).json({ error: "Error al obtener prendas" });
   }
 };
+
 
 // 3. OBTENER UNA PRENDA POR ID
 export const getClothesById = async (req, res) => {

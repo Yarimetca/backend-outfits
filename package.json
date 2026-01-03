@@ -10,7 +10,6 @@
     "migrate": "prisma migrate deploy"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.21.0",
     "@prisma/client": "4.16",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.8.0",
