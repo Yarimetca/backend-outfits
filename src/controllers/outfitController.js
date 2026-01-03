@@ -44,7 +44,10 @@ export const getRecommendation = async (req, res) => {
 
     // 5. Llamar a Gemini
     // Usa este, es el mejor y más rápido
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({
+  model: "gemini-1.0-pro"
+});
+
 
     // ... dentro de outfitController.js
 const prompt = `
@@ -90,4 +93,4 @@ res.json({
     console.error("ERROR EN OUTFIT CONTROLLER:", err);
     res.status(500).json({ error: "La IA se mareó un poco, intenta de nuevo." });
   }
-};
+};  
