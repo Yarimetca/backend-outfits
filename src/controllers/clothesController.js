@@ -3,8 +3,21 @@ import prisma from "../prisma/client.js";
 // 1. CREAR PRENDA (Subir ropa)
 export const createClothes = async (req, res) => {
   try {
-    const { name, categoryId, color, style, season } = req.body;
+    const { name, color, style, season } = req.body;
     const userId = req.user?.id;
+
+    // --- CAMBIO CLAVE: Conversión segura de números ---
+    // Convertimos a número y verificamos si es válido para evitar el error NaN
+    const parsedCategoryId = parseInt(req.body.categoryId);
+    const parsedUserId = parseInt(userId);
+
+    // Validación de seguridad para categoryId
+    if (isNaN(parsedCategoryId)) {
+      console.error("Error: categoryId recibido no es un número:", req.body.categoryId);
+      return res.status(400).json({ 
+        error: "El categoryId es inválido o no fue enviado correctamente." 
+      });
+    }
 
     // Validación: Si no hay archivo, lanzamos error
     if (!req.file) {
@@ -13,21 +26,22 @@ export const createClothes = async (req, res) => {
 
     const newClothes = await prisma.clothes.create({
       data: {
-        name: String(name),
+        name: String(name || "Sin nombre"),
         // Limpiamos la URL para que siempre use barras frontales /
         image: req.file.path.replace(/\\/g, "/"), 
-        categoryId: Number(categoryId),
-        userId: Number(userId),
+        categoryId: parsedCategoryId, // Usamos el número validado
+        userId: parsedUserId,       // Usamos el número validado
         color: String(color || "Indefinido"),
         style: String(style || "Casual"),
         season: String(season || "Todas"),
       },
     });
 
-    console.log("Prenda creada con éxito:", newClothes.id);
+    console.log("Prenda creada con éxito. ID:", newClothes.id);
     return res.status(201).json(newClothes);
+
   } catch (error) {
-    console.error("Error en createClothes:", error);
+    console.error("Error completo en createClothes:", error);
     res.status(500).json({ error: "No se pudo guardar la prenda en la base de datos" });
   }
 };
