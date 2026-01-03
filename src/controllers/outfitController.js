@@ -37,8 +37,9 @@ export const getRecommendation = async (req, res) => {
 
     // CAMBIO VITAL: Usar gemini-1.5-flash
 const model = genAI.getGenerativeModel({
-  model: "gemini-1.0-pro"
+  model: "models/gemini-1.5-flash-latest"
 });
+
 
     const prompt = `
       Eres un experto en moda. Mi armario:
