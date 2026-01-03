@@ -1,8 +1,6 @@
-import prisma from "../prisma/client.js";
-
 export const getRecommendation = async (req, res) => {
   try {
-    const userId = Number(req.user?.id);
+    const userId = Number(req.user.id);
 
     const clothes = await prisma.clothes.findMany({
       where: { userId },
@@ -10,28 +8,19 @@ export const getRecommendation = async (req, res) => {
     });
 
     if (!clothes.length) {
-      return res.status(400).json({ message: "No tienes prendas registradas" });
+      return res.status(400).json({ message: "No hay prendas" });
     }
 
-    // Normalizamos nombres
-    const normalize = (text) => text.toLowerCase().trim();
-
     const tops = clothes.filter(c =>
-      ["camisas", "playeras", "blusas", "tops"].includes(
-        normalize(c.category.name)
-      )
+      c.category.name.toLowerCase() === "top"
     );
 
     const bottoms = clothes.filter(c =>
-      ["pantalones", "faldas", "shorts", "pants"].includes(
-        normalize(c.category.name)
-      )
+      c.category.name.toLowerCase() === "bottom"
     );
 
     const shoes = clothes.filter(c =>
-      ["zapatos", "tenis", "zapatillas"].includes(
-        normalize(c.category.name)
-      )
+      c.category.name.toLowerCase() === "footwear"
     );
 
     if (!tops.length || !bottoms.length || !shoes.length) {
@@ -40,8 +29,8 @@ export const getRecommendation = async (req, res) => {
         detalle: {
           tops: tops.length,
           bottoms: bottoms.length,
-          shoes: shoes.length,
-        },
+          shoes: shoes.length
+        }
       });
     }
 
@@ -51,9 +40,9 @@ export const getRecommendation = async (req, res) => {
       shoes: shoes[Math.floor(Math.random() * shoes.length)],
     };
 
-    res.json(outfit);
+    res.json({ outfit });
   } catch (error) {
-    console.error("ERROR OUTFIT:", error);
+    console.error(error);
     res.status(500).json({ error: "Error generando outfit" });
   }
 };
