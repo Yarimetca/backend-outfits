@@ -9,25 +9,39 @@ export const getRecommendation = async (req, res) => {
       include: { category: true },
     });
 
-    if (clothes.length === 0) {
-      return res.status(400).json({ message: "No hay prendas" });
+    if (!clothes.length) {
+      return res.status(400).json({ message: "No tienes prendas registradas" });
     }
 
+    // Normalizamos nombres
+    const normalize = (text) => text.toLowerCase().trim();
+
     const tops = clothes.filter(c =>
-      ["Camisas", "Playeras", "Blusas"].includes(c.category.name)
+      ["camisas", "playeras", "blusas", "tops"].includes(
+        normalize(c.category.name)
+      )
     );
 
     const bottoms = clothes.filter(c =>
-      ["Pantalones", "Faldas"].includes(c.category.name)
+      ["pantalones", "faldas", "shorts", "pants"].includes(
+        normalize(c.category.name)
+      )
     );
 
     const shoes = clothes.filter(c =>
-      ["Zapatos", "Tenis"].includes(c.category.name)
+      ["zapatos", "tenis", "zapatillas"].includes(
+        normalize(c.category.name)
+      )
     );
 
     if (!tops.length || !bottoms.length || !shoes.length) {
       return res.status(400).json({
-        message: "No hay suficientes prendas para un outfit",
+        message: "Faltan prendas para crear un outfit",
+        detalle: {
+          tops: tops.length,
+          bottoms: bottoms.length,
+          shoes: shoes.length,
+        },
       });
     }
 
@@ -37,9 +51,9 @@ export const getRecommendation = async (req, res) => {
       shoes: shoes[Math.floor(Math.random() * shoes.length)],
     };
 
-    res.json({ outfit });
+    res.json(outfit);
   } catch (error) {
-    console.error(error);
+    console.error("ERROR OUTFIT:", error);
     res.status(500).json({ error: "Error generando outfit" });
   }
 };

@@ -15,10 +15,10 @@ router.post("/", authMiddleware, upload.single("image"), createClothes);
 
 router.get("/", authMiddleware, getClothes);
 
-
 router.get("/:id", authMiddleware, getClothesById);
 
-router.put("/:id", authMiddleware, updateClothes);
+
+router.put("/:id", authMiddleware, upload.single("image"), updateClothes);
 
 router.delete("/:id", authMiddleware, deleteClothes);
 

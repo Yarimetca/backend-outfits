@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 const auth = (req, res, next) => {
 
-  // 🔓 permitir acceso público a uploads
+
   if (req.originalUrl.startsWith("/uploads")) {
     return next();
   }
