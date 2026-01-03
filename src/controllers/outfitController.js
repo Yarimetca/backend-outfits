@@ -43,7 +43,8 @@ export const getRecommendation = async (req, res) => {
     ).join("\n");
 
     // 5. Llamar a Gemini
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // Usa este, es el mejor y más rápido
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     // ... dentro de outfitController.js
 const prompt = `
