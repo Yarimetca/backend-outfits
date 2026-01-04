@@ -3,30 +3,18 @@ import prisma from "../prisma/client.js";
 const NEUTRAL_COLORS = ["black", "white", "gray", "beige", "denim", "neutral"];
 
 async function findCloth({ categoryId, style, season }) {
-  // 1️⃣ match perfecto
   let cloth = await prisma.clothes.findFirst({
-    where: {
-      categoryId,
-      style,
-      season
-    },
+    where: { categoryId, style, season },
     include: { category: true }
   });
-
   if (cloth) return cloth;
 
-  // 2️⃣ mismo style, cualquier season
   cloth = await prisma.clothes.findFirst({
-    where: {
-      categoryId,
-      style
-    },
+    where: { categoryId, style },
     include: { category: true }
   });
-
   if (cloth) return cloth;
 
-  // 3️⃣ neutro
   cloth = await prisma.clothes.findFirst({
     where: {
       categoryId,
@@ -34,16 +22,12 @@ async function findCloth({ categoryId, style, season }) {
     },
     include: { category: true }
   });
-
   if (cloth) return cloth;
 
-  // 4️⃣ cualquiera de la categoría
-  cloth = await prisma.clothes.findFirst({
+  return prisma.clothes.findFirst({
     where: { categoryId },
     include: { category: true }
   });
-
-  return cloth;
 }
 
 export const getRecommendation = async (req, res) => {
@@ -61,13 +45,8 @@ export const getRecommendation = async (req, res) => {
     }
 
     res.json({
-      outfit: {
-        top,
-        bottom,
-        shoes
-      }
+      outfit: { top, bottom, shoes }
     });
-
   } catch (error) {
     console.error("OUTFIT ERROR:", error);
     res.status(500).json({ message: "Error generando outfit" });

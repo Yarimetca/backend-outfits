@@ -1,7 +1,8 @@
-const express = require("express")
-const router = express.Router()
-const outfitController = require("../controllers/outfit.controller")
+import { Router } from "express";
+import { getRecommendation } from "../controllers/outfitController.js";
 
-router.get("/recommend", outfitController.recommendOutfit)
+const router = Router();
 
-module.exports = router
+router.get("/recommend", getRecommendation);
+
+export default router;
