@@ -18,7 +18,7 @@ export const createClothes = async (req, res) => {
     const newClothes = await prisma.clothes.create({
       data: {
         name: name || "Sin nombre",
-        image: req.file.path, // ✅ URL CLOUDINARY DIRECTA
+        image: `${process.env.BASE_URL}/${req.file.path}`,
         categoryId: Number(categoryId),
         userId,
         color: color || "Indefinido",
@@ -99,7 +99,7 @@ export const updateClothes = async (req, res) => {
       data: {
         name: name ?? existingClothe.name,
         // Si subes una foto nueva, la actualizamos; si no, dejamos la anterior
-        image: req.file ? req.file.path.replace(/\\/g, "/") : existingClothe.image,
+      image: req.file ? req.file.path : existingClothe.image,
         categoryId: categoryId ? Number(categoryId) : existingClothe.categoryId,
         color: color ?? existingClothe.color,
         style: style ?? existingClothe.style,
