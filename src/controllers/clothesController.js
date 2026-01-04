@@ -1,14 +1,15 @@
 import prisma from "../prisma/client.js";
 
+
 // CREAR PRENDA
 export const createClothes = async (req, res) => {
   try {
     const { name, color, style, season, categoryId } = req.body;
     const userId = Number(req.user?.id);
 
-if (!userId) {
-  return res.status(401).json({ error: "Usuario no autenticado" });
-}
+    if (!userId) {
+      return res.status(401).json({ error: "Usuario no autenticado" });
+    }
 
     if (!req.file) {
       return res.status(400).json({ error: "Debes subir una imagen" });
@@ -17,12 +18,12 @@ if (!userId) {
     const newClothes = await prisma.clothes.create({
       data: {
         name: name || "Sin nombre",
-        image: req.file.path.replace(/\\/g, "/"),
+        image: req.file.path, // ✅ URL CLOUDINARY DIRECTA
         categoryId: Number(categoryId),
         userId,
         color: color || "Indefinido",
-        style: style || "Casual",
-        season: season || "Todas",
+        style: style || "casual",
+        season: season || "todas",
       },
     });
 
