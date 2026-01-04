@@ -1,27 +1,30 @@
 import jwt from "jsonwebtoken";
 
 const auth = (req, res, next) => {
-
-
-  if (req.originalUrl.startsWith("/uploads")) {
-    return next();
-  }
-
   try {
-    const header = req.headers.authorization;
-    if (!header) return res.status(401).json({ error: "Token requerido" });
+    const authHeader = req.headers.authorization;
 
-    const token = header.startsWith("Bearer ")
-      ? header.split(" ")[1]
-      : header;
+    if (!authHeader) {
+      return res.status(401).json({ message: "No token provided" });
+    }
 
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const token = authHeader.split(" ")[1]; // Bearer TOKEN
 
-    req.user = { id: payload.userId };
+    if (!token) {
+      return res.status(401).json({ message: "Invalid token format" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // 🔥 ESTO ES CLAVE
+    req.user = {
+      id: decoded.id, // COINCIDE con el login
+    };
+
     next();
-
-  } catch (err) {
-    return res.status(401).json({ error: "Token inválido" });
+  } catch (error) {
+    console.error("AUTH ERROR:", error);
+    return res.status(401).json({ message: "Token inválido" });
   }
 };
 
