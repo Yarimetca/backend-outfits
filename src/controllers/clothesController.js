@@ -6,6 +6,10 @@ export const createClothes = async (req, res) => {
     const { name, color, style, season, categoryId } = req.body;
     const userId = Number(req.user?.id);
 
+if (!userId) {
+  return res.status(401).json({ error: "Usuario no autenticado" });
+}
+
     if (!req.file) {
       return res.status(400).json({ error: "Debes subir una imagen" });
     }
@@ -33,6 +37,10 @@ export const createClothes = async (req, res) => {
 export const getClothes = async (req, res) => {
   try {
     const userId = Number(req.user?.id);
+
+if (!userId) {
+  return res.status(401).json({ error: "Usuario no autenticado" });
+}
 
     const clothes = await prisma.clothes.findMany({
       where: { userId },
