@@ -4,6 +4,7 @@ import userRoutes from "./userRoutes.js";
 import categoryRoutes from "./categoryRoutes.js";
 import clothesRoutes from "./clothesRoutes.js";
 import outfitRoutes from "./outfitRoutes.js";
+import outfitRoutes from "./routes/outfit.routes.js";
 
 const router = Router();
 

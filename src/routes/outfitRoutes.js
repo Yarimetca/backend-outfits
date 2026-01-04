@@ -1,9 +1,7 @@
-import express from "express";
-import auth from "../middleware/auth.js";
-import { getRecommendation } from "../controllers/outfitController.js";
+const express = require("express")
+const router = express.Router()
+const outfitController = require("../controllers/outfit.controller")
 
-const router = express.Router();
+router.get("/recommend", outfitController.recommendOutfit)
 
-router.get("/recommend", auth, getRecommendation);
-
-export default router;
+module.exports = router

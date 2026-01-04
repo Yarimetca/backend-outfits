@@ -1,50 +1,75 @@
 import prisma from "../prisma/client.js";
 
+const NEUTRAL_COLORS = ["black", "white", "gray", "beige", "denim", "neutral"];
+
+async function findCloth({ categoryId, style, season }) {
+  // 1️⃣ match perfecto
+  let cloth = await prisma.clothes.findFirst({
+    where: {
+      categoryId,
+      style,
+      season
+    },
+    include: { category: true }
+  });
+
+  if (cloth) return cloth;
+
+  // 2️⃣ mismo style, cualquier season
+  cloth = await prisma.clothes.findFirst({
+    where: {
+      categoryId,
+      style
+    },
+    include: { category: true }
+  });
+
+  if (cloth) return cloth;
+
+  // 3️⃣ neutro
+  cloth = await prisma.clothes.findFirst({
+    where: {
+      categoryId,
+      color: { in: NEUTRAL_COLORS }
+    },
+    include: { category: true }
+  });
+
+  if (cloth) return cloth;
+
+  // 4️⃣ cualquiera de la categoría
+  cloth = await prisma.clothes.findFirst({
+    where: { categoryId },
+    include: { category: true }
+  });
+
+  return cloth;
+}
+
 export const getRecommendation = async (req, res) => {
   try {
-    const userId = Number(req.user.id);
+    const { style = "casual", season = "todas" } = req.query;
 
-    const clothes = await prisma.clothes.findMany({
-      where: { userId },
-      include: { category: true },
-    });
+    const top = await findCloth({ categoryId: 1, style, season });
+    const bottom = await findCloth({ categoryId: 2, style, season });
+    const shoes = await findCloth({ categoryId: 3, style, season });
 
-    if (!clothes.length) {
-      return res.status(400).json({ message: "No hay prendas" });
-    }
-
-    const tops = clothes.filter(c =>
-      c.category.name.toLowerCase() === "top"
-    );
-
-    const bottoms = clothes.filter(c =>
-      c.category.name.toLowerCase() === "bottom"
-    );
-
-    const shoes = clothes.filter(c =>
-      c.category.name.toLowerCase() === "footwear"
-    );
-
-    if (!tops.length || !bottoms.length || !shoes.length) {
-      return res.status(400).json({
-        message: "Faltan prendas para crear un outfit",
-        detalle: {
-          tops: tops.length,
-          bottoms: bottoms.length,
-          shoes: shoes.length
-        }
+    if (!top || !bottom || !shoes) {
+      return res.status(404).json({
+        message: "No hay prendas suficientes para armar outfit"
       });
     }
 
-    const outfit = {
-      top: tops[Math.floor(Math.random() * tops.length)],
-      bottom: bottoms[Math.floor(Math.random() * bottoms.length)],
-      shoes: shoes[Math.floor(Math.random() * shoes.length)],
-    };
+    res.json({
+      outfit: {
+        top,
+        bottom,
+        shoes
+      }
+    });
 
-    res.json({ outfit });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error generando outfit" });
+    console.error("OUTFIT ERROR:", error);
+    res.status(500).json({ message: "Error generando outfit" });
   }
 };
