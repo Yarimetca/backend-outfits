@@ -14,11 +14,12 @@ export const createClothes = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "Debes subir una imagen" });
     }
-
-    const newClothes = await prisma.clothes.create({
-      data: {
-        name: name || "Sin nombre",
-        image: `${process.env.BASE_URL}/${req.file.path}`,
+    
+const imagePath = (req.file && req.file.path) ? String(req.file.path).replace(/^undefined\//, '') : "";
+const newClothes = await prisma.clothes.create({
+  data: {
+    name: name || "Sin nombre",
+    image: imagePath,
         categoryId: Number(categoryId),
         userId,
         color: color || "Indefinido",
